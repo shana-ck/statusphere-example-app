@@ -6,6 +6,7 @@ import { lexicons } from '../../../lexicons'
 import { isObj, hasProp } from '../../../util'
 import { CID } from 'multiformats/cid'
 
+/** status emoji */
 export interface Record {
   status: string
   createdAt: string

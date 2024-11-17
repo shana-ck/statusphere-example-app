@@ -4,6 +4,57 @@
 import { LexiconDoc, Lexicons } from '@atproto/lexicon'
 
 export const schemaDict = {
+  BooKmarkBoard: {
+    lexicon: 1,
+    id: 'boo.kmark.board',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'Record of a board of bookmarks',
+        record: {
+          type: 'object',
+          required: ['bookmarks', 'createdAt'],
+          properties: {
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+            },
+            bookmarks: {
+              type: 'array',
+              description: 'an array of bookmarks',
+              items: {
+                type: 'ref',
+                ref: 'lex:boo.kmark.board#pin',
+              },
+            },
+          },
+        },
+      },
+      pin: {
+        type: 'object',
+        description: 'a record of a bookmark',
+        required: ['url'],
+        properties: {
+          url: {
+            type: 'string',
+            format: 'uri',
+            description: 'the url of the bookmark',
+          },
+          text: {
+            type: 'string',
+            description: 'optional text for bookmark',
+          },
+          tags: {
+            type: 'array',
+            description: 'an array of tags assigned to bookmark',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  },
   AppBskyActorProfile: {
     lexicon: 1,
     id: 'app.bsky.actor.profile',
@@ -68,6 +119,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
+          description: 'status emoji',
           required: ['status', 'createdAt'],
           properties: {
             status: {
@@ -89,6 +141,7 @@ export const schemaDict = {
 export const schemas: LexiconDoc[] = Object.values(schemaDict) as LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
 export const ids = {
+  BooKmarkBoard: 'boo.kmark.board',
   AppBskyActorProfile: 'app.bsky.actor.profile',
   XyzStatusphereStatus: 'xyz.statusphere.status',
 }

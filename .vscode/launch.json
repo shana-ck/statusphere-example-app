@@ -8,6 +8,7 @@
   "internalConsoleOptions": "neverOpen",
   "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
   "configurations": [
+    
     {
       "command": "npm start",
       "name": "Run npm start",
