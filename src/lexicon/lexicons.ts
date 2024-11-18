@@ -13,19 +13,14 @@ export const schemaDict = {
         description: 'Record of a board of bookmarks',
         record: {
           type: 'object',
-          required: ['bookmarks', 'createdAt'],
+          required: ['board', 'createdAt'],
           properties: {
             createdAt: {
               type: 'string',
               format: 'datetime',
             },
-            bookmarks: {
-              type: 'array',
-              description: 'an array of bookmarks',
-              items: {
-                type: 'ref',
-                ref: 'lex:boo.kmark.board#pin',
-              },
+            board: {
+              type: 'string',
             },
           },
         },

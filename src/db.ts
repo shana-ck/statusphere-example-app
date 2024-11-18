@@ -11,6 +11,7 @@ import {
 
 export type DatabaseSchema = {
   status: Status;
+  board: Board;
   auth_session: AuthSession;
   auth_state: AuthState;
 };
@@ -69,7 +70,7 @@ migrations["001"] = {
       .createTable("board")
       .addColumn("uri", "varchar", (col) => col.primaryKey())
       .addColumn("authorDid", "varchar", (col) => col.notNull())
-      .addColumn("status", "varchar", (col) => col.notNull())
+      .addColumn("board", "varchar", (col) => col.notNull())
       .addColumn("createdAt", "varchar", (col) => col.notNull())
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
       .execute();
@@ -88,6 +89,7 @@ migrations["001"] = {
     await db.schema.dropTable("auth_state").execute();
     await db.schema.dropTable("auth_session").execute();
     await db.schema.dropTable("status").execute();
+    await db.schema.dropTable("board").execute()
   },
 };
 

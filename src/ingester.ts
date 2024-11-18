@@ -3,6 +3,7 @@ import { IdResolver } from '@atproto/identity'
 import { Firehose } from '@atproto/sync'
 import type { Database } from '#/db'
 import * as Status from '#/lexicon/types/xyz/statusphere/status'
+import * as Board from '#/lexicon/types/boo/kmark/board'
 
 export function createIngester(db: Database, idResolver: IdResolver) {
   const logger = pino({ name: 'firehose ingestion' })
@@ -13,6 +14,28 @@ export function createIngester(db: Database, idResolver: IdResolver) {
       if (evt.event === 'create' || evt.event === 'update') {
         const now = new Date()
         const record = evt.record
+        if (
+          evt.collection === 'boo.kmark.board' &&
+          Board.isRecord(record) &&
+          Board.validateRecord(record).success
+        ) {
+          await db
+          .insertInto('board')
+          .values({
+            uri: evt.uri.toString(),
+            authorDid: evt.did,
+            board: record.board,
+            createdAt: record.createdAt,
+            indexedAt: now.toISOString(),
+          })
+          .onConflict((oc) =>
+            oc.column('uri').doUpdateSet({
+              board: record.board,
+              indexedAt: now.toISOString(),
+            })
+          )
+          .execute()
+        }
 
         // If the write is a valid status update
         if (
@@ -49,7 +72,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
     onError: (err) => {
       logger.error({ err }, 'error on firehose ingestion')
     },
-    filterCollections: ['xyz.statusphere.status'],
+    filterCollections: ['xyz.statusphere.status', 'boo.kmark.board'],
     excludeIdentity: true,
     excludeAccount: true,
   })
