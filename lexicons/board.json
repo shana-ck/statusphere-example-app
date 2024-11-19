@@ -14,7 +14,11 @@
                         "format": "datetime"
                     },
                     "board": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "ref",
+                            "ref": "#pin"
+                        }
                     }
                 }
             }

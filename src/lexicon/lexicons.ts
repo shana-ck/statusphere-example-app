@@ -20,7 +20,11 @@ export const schemaDict = {
               format: 'datetime',
             },
             board: {
-              type: 'string',
+              type: 'array',
+              items: {
+                type: 'ref',
+                ref: 'lex:boo.kmark.board#pin',
+              },
             },
           },
         },

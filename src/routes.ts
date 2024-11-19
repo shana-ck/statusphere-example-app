@@ -222,6 +222,7 @@ export const createRouter = (ctx: AppContext) => {
         board: req.body?.board,
         createdAt: new Date().toISOString(),
       };
+      console.log(record)
       if (!Board.validateRecord(record).success) {
         return res.status(400).json({ error: "Invalid board" });
       }
@@ -243,9 +244,36 @@ export const createRouter = (ctx: AppContext) => {
           .type("html")
           .send("<h1>Error: Failed to write record</h1>");
       }
-      res.status(200).json({});
+      try {
+        // Optimistically update our SQLite
+        // This isn't strictly necessary because the write event will be
+        // handled in #/firehose/ingestor.ts, but it ensures that future reads
+        // will be up-to-date after this method finishes.
+        await ctx.db
+          .insertInto("board")
+          .values({
+            uri,
+            authorDid: agent.assertDid,
+            board: record.board,
+            createdAt: record.createdAt,
+            indexedAt: new Date().toISOString(),
+          })
+          .execute();
+      } catch (err) {
+        ctx.logger.warn(
+          { err },
+          "failed to update computed view; ignoring as it should be caught by the firehose"
+        );
+      }
+
+      return res.redirect("/");
     })
-  );
+    
+  
+  )
+    
+    
+  
 
   // "Set status" handler
   router.post(
@@ -267,6 +295,7 @@ export const createRouter = (ctx: AppContext) => {
         status: req.body?.status,
         createdAt: new Date().toISOString(),
       };
+      console.log(record)
       if (!Status.validateRecord(record).success) {
         return res
           .status(400)

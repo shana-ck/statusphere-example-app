@@ -27,7 +27,7 @@ export type Status = {
 export type Board = {
   uri: string;
   authorDid: string;
-  board: string;
+  board: object;
   createdAt: string;
   indexedAt: string;
 };

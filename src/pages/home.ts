@@ -99,7 +99,7 @@ function content({ statuses, didHandleMap, profile, myStatus, myBoard, boards }:
               class=${myBoard?.board === status
                 ? 'status-option selected'
                 : 'status-option'}
-              name="status"
+              name="board"
               value="${status}"
             >
               ${status}
