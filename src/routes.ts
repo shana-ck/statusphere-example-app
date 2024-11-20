@@ -220,6 +220,7 @@ export const createRouter = (ctx: AppContext) => {
       const record = {
         $type: "boo.kmark.board",
         board: req.body?.board,
+        pin: req.body?.pin,
         createdAt: new Date().toISOString(),
       };
       console.log(record)

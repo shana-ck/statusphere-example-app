@@ -28,6 +28,7 @@ export type Board = {
   uri: string;
   authorDid: string;
   board: object;
+  pin: object;
   createdAt: string;
   indexedAt: string;
 };
