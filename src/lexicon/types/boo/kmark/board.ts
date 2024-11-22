@@ -8,8 +8,8 @@ import { CID } from 'multiformats/cid'
 
 export interface Record {
   createdAt: string
+  board: Pin[]
   /** an array of bookmarks */
-  bookmarks: Pin[]
   [k: string]: unknown
 }
 

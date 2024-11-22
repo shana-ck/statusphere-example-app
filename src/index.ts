@@ -5,6 +5,7 @@ import { pino } from 'pino'
 import type { OAuthClient } from '@atproto/oauth-client-node'
 import { Firehose } from '@atproto/sync'
 
+
 import { createDb, migrateToLatest } from '#/db'
 import { env } from '#/lib/env'
 import { createIngester } from '#/ingester'
@@ -13,11 +14,12 @@ import { createClient } from '#/auth/client'
 import { createBidirectionalResolver, createIdResolver, BidirectionalResolver } from '#/id-resolver'
 import type { Database } from '#/db'
 import { IdResolver, MemoryCache } from '@atproto/identity'
+import { Jetstream } from '@skyware/jetstream'
 
 // Application state passed to the router and elsewhere
 export type AppContext = {
   db: Database
-  ingester: Firehose
+  ingester: Jetstream
   logger: pino.Logger
   oauthClient: OAuthClient
   resolver: BidirectionalResolver
@@ -75,7 +77,7 @@ export class Server {
 
   async close() {
     this.ctx.logger.info('sigint received, shutting down')
-    await this.ctx.ingester.destroy()
+    await this.ctx.ingester.close()
     return new Promise<void>((resolve) => {
       this.server.close(() => {
         this.ctx.logger.info('server closed')

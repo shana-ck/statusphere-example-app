@@ -1,6 +1,7 @@
 import type { Status } from '#/db'
 import { html } from '../lib/view'
 import { shell } from './shell'
+import type { Board } from '#/db'
 
 const TODAY = new Date().toDateString()
 
@@ -33,12 +34,15 @@ const STATUS_OPTIONS = [
   '🦋',
   '🚀',
 ]
+const test = "test"
 
 type Props = {
   statuses: Status[]
   didHandleMap: Record<string, string>
   profile?: { displayName?: string }
   myStatus?: Status
+  boards: Board[]
+  myBoard?: Board
 }
 
 export function home(props: Props) {
@@ -48,7 +52,7 @@ export function home(props: Props) {
   })
 }
 
-function content({ statuses, didHandleMap, profile, myStatus }: Props) {
+function content({ statuses, didHandleMap, profile, myStatus, myBoard, boards }: Props) {
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
@@ -82,6 +86,20 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
                 ? 'status-option selected'
                 : 'status-option'}
               name="status"
+              value="${status}"
+            >
+              ${status}
+            </button>`
+        )}
+      </form>
+      <form action="/board" method="post">
+        ${STATUS_OPTIONS.map(
+          (status) =>
+            html`<button
+              class=${myBoard?.board === status
+                ? 'status-option selected'
+                : 'status-option'}
+              name="board"
               value="${status}"
             >
               ${status}
