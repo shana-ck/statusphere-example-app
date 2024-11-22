@@ -7,6 +7,7 @@
       "key": "tid",
       "record": {
         "type": "object",
+        "description": "status emoji",
         "required": ["status", "createdAt"],
         "properties": {
           "status": {

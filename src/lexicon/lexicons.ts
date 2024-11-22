@@ -13,8 +13,9 @@ export const schemaDict = {
         description: 'Record of a board of bookmarks',
         record: {
           type: 'object',
+
           required: ['board', 'createdAt'],
-          properties: {
+   properties: {
             createdAt: {
               type: 'string',
               format: 'datetime',
@@ -297,6 +298,7 @@ export const schemaDict = {
         key: 'tid',
         record: {
           type: 'object',
+          description: 'status emoji',
           required: ['status', 'createdAt'],
           properties: {
             status: {
