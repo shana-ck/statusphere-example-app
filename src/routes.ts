@@ -154,6 +154,20 @@ export const createRouter = (ctx: AppContext) => {
       const agent = await getSessionAgent(req, res, ctx);
 
       // Fetch data stored in our SQLite
+      const boards = await ctx.db
+      .selectFrom("board")
+      .selectAll()
+      .orderBy("indexedAt", "desc")
+      .limit(10)
+      .execute()
+      const myBoard = agent
+      ? await ctx.db
+      .selectFrom("board")
+      .selectAll()
+      .where("authorDid", "=", agent.assertDid)
+      .orderBy("createdAt", "desc")
+      .executeTakeFirst() :
+      undefined;
       const statuses = await ctx.db
         .selectFrom("status")
         .selectAll()
@@ -174,9 +188,13 @@ export const createRouter = (ctx: AppContext) => {
         statuses.map((s) => s.authorDid)
       );
 
+      const didHandleMap2 = await ctx.resolver.resolveDidsToHandles(
+        boards.map((b)=> b.authorDid)
+      )
+
       if (!agent) {
         // Serve the logged-out view
-        return res.type("html").send(page(home({ statuses, didHandleMap })));
+        return res.type("html").send(page(home({ statuses, boards, didHandleMap })));
       }
 
       // Fetch additional information about the logged-in user
@@ -196,9 +214,11 @@ export const createRouter = (ctx: AppContext) => {
         page(
           home({
             statuses,
+            boards,
             didHandleMap,
             profile,
             myStatus,
+            myBoard
           })
         )
       );
@@ -219,8 +239,7 @@ export const createRouter = (ctx: AppContext) => {
       const rkey = TID.nextStr();
       const record = {
         $type: "boo.kmark.board",
-        board: req.body?.board,
-        pin: req.body?.pin,
+        name: req.body?.name,
         createdAt: new Date().toISOString(),
       };
       console.log(record)
@@ -255,7 +274,7 @@ export const createRouter = (ctx: AppContext) => {
           .values({
             uri,
             authorDid: agent.assertDid,
-            board: record.board,
+            name: record.name,
             createdAt: record.createdAt,
             indexedAt: new Date().toISOString(),
           })

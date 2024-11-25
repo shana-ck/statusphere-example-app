@@ -1,0 +1,61 @@
+{
+    "lexicon": 1,
+    "id": "boo.kmark.boarditem",
+    "defs": {
+        "main": {
+            "type": "record",
+            "description": "Record of a bookmark on a board",
+            "key": "tid",
+            "record": {
+                "type": "object",
+                "required": ["createdAt", "board", "pins"],
+                "properties": {
+                    "createdAt": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "board": {
+                        "type": "string",
+                        "format": "at-uri",
+                        "description": "at-uri of the board record"
+                    },
+                    "pins": {
+                        "type": "array",
+                        "items": {
+                            "type": "ref",
+                            "ref": "pin"
+                                }
+                            }
+                        }
+                    }
+                },
+                "pin": {
+                    "type": "object",
+                    "required": ["url", "createdAt"],
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "description": "URL of the link",
+                            "format": "uri"
+                        },
+                        "createdAt": {
+                            "type": "string",
+                            "format": "datetime"
+                        },
+                        "text": {
+                            "type": "string",
+                            "description": "Name of link"
+                        },
+                        "tags": {
+                            "type": "array",
+                            "description": "An array of tags for the pin",
+                            "maxLength": 10,
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        

@@ -27,7 +27,7 @@ export type Status = {
 export type Board = {
   uri: string;
   authorDid: string;
-  board: object;
+  name: object;
   pin: object;
   createdAt: string;
   indexedAt: string;
@@ -71,7 +71,7 @@ migrations["001"] = {
       .createTable("board")
       .addColumn("uri", "varchar", (col) => col.primaryKey())
       .addColumn("authorDid", "varchar", (col) => col.notNull())
-      .addColumn("board", "varchar", (col) => col.notNull())
+      .addColumn("name", "varchar", (col) => col.notNull())
       .addColumn("createdAt", "varchar", (col) => col.notNull())
       .addColumn("indexedAt", "varchar", (col) => col.notNull())
       .execute();

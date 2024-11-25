@@ -48,24 +48,6 @@ export class BooKmarkNS {
   }
 }
 
-export class BooNS {
-  _server: Server
-  kmark: BooKmarkNS
-
-  constructor(server: Server) {
-    this._server = server
-    this.kmark = new BooKmarkNS(server)
-  }
-}
-
-export class BooKmarkNS {
-  _server: Server
-
-  constructor(server: Server) {
-    this._server = server
-  }
-}
-
 export class AppNS {
   _server: Server
   bsky: AppBskyNS

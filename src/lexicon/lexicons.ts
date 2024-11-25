@@ -11,20 +11,50 @@ export const schemaDict = {
       main: {
         type: 'record',
         description: 'Record of a board of bookmarks',
+        key: 'tid',
         record: {
           type: 'object',
-
-          required: ['board', 'createdAt'],
-   properties: {
+          required: ['createdAt', 'name'],
+          properties: {
+            createdAt: {
+              type: 'string',
+              format: 'datetime',
+            },
+            name: {
+              type: 'string',
+              description: 'Name of the board',
+            },
+          },
+        },
+      },
+    },
+  },
+  BooKmarkBoarditem: {
+    lexicon: 1,
+    id: 'boo.kmark.boarditem',
+    defs: {
+      main: {
+        type: 'record',
+        description: 'Record of a bookmark on a board',
+        key: 'tid',
+        record: {
+          type: 'object',
+          required: ['createdAt', 'board', 'pins'],
+          properties: {
             createdAt: {
               type: 'string',
               format: 'datetime',
             },
             board: {
+              type: 'string',
+              format: 'at-uri',
+              description: 'at-uri of the board record',
+            },
+            pins: {
               type: 'array',
               items: {
                 type: 'ref',
-                ref: 'lex:boo.kmark.board#pin',
+                ref: 'lex:pin',
               },
             },
           },
@@ -32,21 +62,25 @@ export const schemaDict = {
       },
       pin: {
         type: 'object',
-        description: 'a record of a bookmark',
-        required: ['url'],
+        required: ['url', 'createdAt'],
         properties: {
           url: {
             type: 'string',
+            description: 'URL of the link',
             format: 'uri',
-            description: 'the url of the bookmark',
+          },
+          createdAt: {
+            type: 'string',
+            format: 'datetime',
           },
           text: {
             type: 'string',
-            description: 'optional text for bookmark',
+            description: 'Name of link',
           },
           tags: {
             type: 'array',
-            description: 'an array of tags assigned to bookmark',
+            description: 'An array of tags for the pin',
+            maxLength: 10,
             items: {
               type: 'string',
             },
@@ -342,6 +376,7 @@ export const schemas: LexiconDoc[] = Object.values(schemaDict) as LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
 export const ids = {
   BooKmarkBoard: 'boo.kmark.board',
+  BooKmarkBoarditem: 'boo.kmark.boarditem',
   ComAtprotoLabelDefs: 'com.atproto.label.defs',
   AppBskyActorProfile: 'app.bsky.actor.profile',
   XyzStatusphereStatus: 'xyz.statusphere.status',
