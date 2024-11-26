@@ -36,7 +36,6 @@ const STATUS_OPTIONS = [
   '🦋',
   '🚀',
 ]
-const test = "test"
 
 type Props = {
   statuses: Status[]
@@ -91,14 +90,16 @@ function content({ statuses, didHandleMap, profile, myStatus, myBoard, boards }:
         const date = ts(board)
         return html`
           <div class=${i === 0 ? 'status-line no-line' : 'status-line'}>
-            <div>
-              <div class="status">${board.name}</div>
-            </div>
-            <div class="desc">
+            <div class="card">
+            <div class="content">
               <a class="author" href=${toBskyLink(handle)}>@${handle}</a>
               ${date === TODAY
-                ? `is feeling ${board.name} today`
-                : `was feeling ${board.name} on ${date}`}
+                ? `created a new board ${board.name} today`
+                : `created a new board ${board.name} on ${date}`}
+                </div>
+                <div class="delete">
+                <form action="/board" method="delete"><button type="submit">x</button></form>
+                </div>
             </div>
           </div>
         `

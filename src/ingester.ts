@@ -13,27 +13,22 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   //   ws: WebSocket,
   //   wantedCollections: ['boo.kmark.*', 'xyz.statusphere.*']
   // })
+  const jetstream = new Jetstream({
+    ws: WebSocket,
+    wantedCollections: ['boo.kmark.*']
+  })
 
-    
-
-
-  const logger = pino({ name: 'firehose ingestion' })
-  return new Firehose({
-    idResolver,
-    handleEvent: async (evt) => {
-      // Watch for write events
-      if (evt.event === 'create' || evt.event === 'update') {
-        const now = new Date()
-        const record = evt.record
-        if (
-          evt.collection === 'boo.kmark.board' &&
-          Board.isRecord(record) &&
-          Board.validateRecord(record).success
-        ) {
-          await db
+  jetstream.on("commit", async (evt) => {
+    if (evt.commit.operation == 'create' || evt.commit.operation === 'update') {
+      const now = new Date()
+      const record = evt.commit.record
+      const uri = `at://${evt.did}/${evt.commit.collection}/${evt.commit
+      .rkey}`;
+      if (evt.commit.collection === 'boo.kmark.board' && Board.isRecord(record) && Board.validateRecord(record).success) {
+                  await db
           .insertInto('board')
           .values({
-            uri: evt.uri.toString(),
+            uri: uri.toString(),
             authorDid: evt.did,
             name: record.name,
             createdAt: record.createdAt,
@@ -46,46 +41,88 @@ export function createIngester(db: Database, idResolver: IdResolver) {
             })
           )
           .execute()
-        }
 
-        // If the write is a valid status update
-        if (
-          evt.collection === 'xyz.statusphere.status' &&
-          Status.isRecord(record) &&
-          Status.validateRecord(record).success
-        ) {
-          // Store the status in our SQLite
-          await db
-            .insertInto('status')
-            .values({
-              uri: evt.uri.toString(),
-              authorDid: evt.did,
-              status: record.status,
-              createdAt: record.createdAt,
-              indexedAt: now.toISOString(),
-            })
-            .onConflict((oc) =>
-              oc.column('uri').doUpdateSet({
-                status: record.status,
-                indexedAt: now.toISOString(),
-              })
-            )
-            .execute()
-        }
-      } else if (
-        evt.event === 'delete' &&
-        evt.collection === 'xyz.statusphere.status'
-      ) {
-        // Remove the status from our SQLite
-        await db.deleteFrom('status').where('uri', '=', evt.uri.toString()).execute()
       }
-    },
-    onError: (err) => {
-      logger.error({ err }, 'error on firehose ingestion')
-    },
-    filterCollections: ['xyz.statusphere.status', 'boo.kmark.board'],
-    excludeIdentity: true,
-    excludeAccount: true,
+    } else if (evt.commit.operation === 'delete' && evt.commit.collection === 'boo.kmark.board') {
+      const uri = `at://${evt.did}/${evt.commit.collection}/${evt.commit
+      .rkey}`;
+      console.log("deleting!")
+      await db.deleteFrom('board').where('uri', '=', uri.toString()).execute()
+    }
   })
 
+    
+
+
+  const logger = pino({ name: 'firehose ingestion' })
+  // return new Firehose({
+  //   idResolver,
+  //   handleEvent: async (evt) => {
+  //     // Watch for write events
+  //     if (evt.event === 'create' || evt.event === 'update') {
+  //       const now = new Date()
+  //       const record = evt.record
+  //       if (
+  //         evt.collection === 'boo.kmark.board' &&
+  //         Board.isRecord(record) &&
+  //         Board.validateRecord(record).success
+  //       ) {
+  //         await db
+  //         .insertInto('board')
+  //         .values({
+  //           uri: evt.uri.toString(),
+  //           authorDid: evt.did,
+  //           name: record.name,
+  //           createdAt: record.createdAt,
+  //           indexedAt: now.toISOString(),
+  //         })
+  //         .onConflict((oc) =>
+  //           oc.column('uri').doUpdateSet({
+  //             name: record.name,
+  //             indexedAt: now.toISOString(),
+  //           })
+  //         )
+  //         .execute()
+  //       }
+
+  //       // If the write is a valid status update
+  //       if (
+  //         evt.collection === 'xyz.statusphere.status' &&
+  //         Status.isRecord(record) &&
+  //         Status.validateRecord(record).success
+  //       ) {
+  //         // Store the status in our SQLite
+  //         await db
+  //           .insertInto('status')
+  //           .values({
+  //             uri: evt.uri.toString(),
+  //             authorDid: evt.did,
+  //             status: record.status,
+  //             createdAt: record.createdAt,
+  //             indexedAt: now.toISOString(),
+  //           })
+  //           .onConflict((oc) =>
+  //             oc.column('uri').doUpdateSet({
+  //               status: record.status,
+  //               indexedAt: now.toISOString(),
+  //             })
+  //           )
+  //           .execute()
+  //       }
+  //     } else if (
+  //       evt.event === 'delete' &&
+  //       evt.collection === 'xyz.statusphere.status'
+  //     ) {
+  //       // Remove the status from our SQLite
+  //       await db.deleteFrom('status').where('uri', '=', evt.uri.toString()).execute()
+  //     }
+  //   },
+  //   onError: (err) => {
+  //     logger.error({ err }, 'error on firehose ingestion')
+  //   },
+  //   filterCollections: ['xyz.statusphere.status', 'boo.kmark.board'],
+  //   excludeIdentity: true,
+  //   excludeAccount: true,
+  // })
+  return jetstream
 }

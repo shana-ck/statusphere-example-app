@@ -185,7 +185,7 @@ export const createRouter = (ctx: AppContext) => {
 
       // Map user DIDs to their domain-name handles
       const didHandleMap = await ctx.resolver.resolveDidsToHandles(
-        statuses.map((s) => s.authorDid)
+        boards.map((s) => s.authorDid)
       );
 
       const didHandleMap2 = await ctx.resolver.resolveDidsToHandles(
@@ -292,7 +292,35 @@ export const createRouter = (ctx: AppContext) => {
   
   )
     
-    
+  //"Delete record" handler
+  router.delete("/board", handler(async (req, res) => {
+    const agent = await getSessionAgent(req, res, ctx);
+    if (!agent) {
+      return res
+        .status(401)
+        .type("html")
+        .send("<h1>Error: Session required</h1>");
+    }
+    const rkey = req.body?.value.split("/").pop()
+    console.log(req)
+    try {
+      // Write the board record to the user's repository
+      const res = await agent.com.atproto.repo.deleteRecord({
+        repo: agent.assertDid,
+        collection: "boo.kmark.board",
+        rkey,
+        validate: false,
+      });
+      console.log("deleting " + res.success)
+    } catch (err) {
+      ctx.logger.warn({ err }, "failed to delete record");
+      return res
+        .status(500)
+        .type("html")
+        .send("<h1>Error: Failed to delete record</h1>");
+    }
+    return res.redirect("/")
+  }))
   
 
   // "Set status" handler
