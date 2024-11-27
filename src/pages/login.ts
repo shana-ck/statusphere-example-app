@@ -13,8 +13,8 @@ export function login(props: Props) {
 function content({ error }: Props) {
   return html`<div id="root">
     <div id="header">
-      <h1>Statusphere</h1>
-      <p>Set your status on the Atmosphere.</p>
+      <h1>KMARKS.BOO</h1>
+      <p>Share and maintain bookmark boards</p>
     </div>
     <div class="container">
       <form action="/login" method="post" class="login-form">

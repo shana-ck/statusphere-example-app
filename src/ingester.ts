@@ -46,7 +46,7 @@ export function createIngester(db: Database, idResolver: IdResolver) {
     } else if (evt.commit.operation === 'delete' && evt.commit.collection === 'boo.kmark.board') {
       const uri = `at://${evt.did}/${evt.commit.collection}/${evt.commit
       .rkey}`;
-      console.log("deleting!")
+
       await db.deleteFrom('board').where('uri', '=', uri.toString()).execute()
     }
   })

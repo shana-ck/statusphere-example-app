@@ -16,6 +16,7 @@ import * as Status from "#/lexicon/types/xyz/statusphere/status";
 import * as Board from "#/lexicon/types/boo/kmark/board";
 import * as Profile from "#/lexicon/types/app/bsky/actor/profile";
 
+
 type Session = { did: string };
 
 // Helper function for defining routes
@@ -27,6 +28,7 @@ const handler =
     next: express.NextFunction
   ) => {
     try {
+      console.log(req.body)
       await fn(req, res, next);
     } catch (err) {
       next(err);
@@ -293,7 +295,7 @@ export const createRouter = (ctx: AppContext) => {
   )
     
   //"Delete record" handler
-  router.delete("/board", handler(async (req, res) => {
+  router.delete("/deleteboard", handler(async (req, res) => {
     const agent = await getSessionAgent(req, res, ctx);
     if (!agent) {
       return res
@@ -301,8 +303,8 @@ export const createRouter = (ctx: AppContext) => {
         .type("html")
         .send("<h1>Error: Session required</h1>");
     }
-    const rkey = req.body?.value.split("/").pop()
-    console.log(req)
+    const rkey = req.body?.id.split("/").pop()
+
     try {
       // Write the board record to the user's repository
       const res = await agent.com.atproto.repo.deleteRecord({
@@ -311,7 +313,6 @@ export const createRouter = (ctx: AppContext) => {
         rkey,
         validate: false,
       });
-      console.log("deleting " + res.success)
     } catch (err) {
       ctx.logger.warn({ err }, "failed to delete record");
       return res

@@ -2,6 +2,7 @@ import type { Status } from '#/db'
 import { html } from '../lib/view'
 import { shell } from './shell'
 import type { Board } from '#/db'
+import { json } from 'body-parser'
 
 
 const TODAY = new Date().toDateString()
@@ -78,30 +79,29 @@ function content({ statuses, didHandleMap, profile, myStatus, myBoard, boards }:
               </div>
             </div>`}
       </div>
+      <div class="container">
       <form action="/board" method="post">
       <div class="form-group">
         <label for="name">Board Name</label>
         <input type="text" class="form-input" name="name">
-        </div>
         <button type="submit">Create New Board</button>
+        </div>
       </form>
+      </div>
       ${boards.map((board, i) => {
         const handle = didHandleMap[board.authorDid] || board.authorDid
         const date = ts(board)
         return html`
-          <div class=${i === 0 ? 'status-line no-line' : 'status-line'}>
+
             <div class="card">
+            <form action="/deleteboard" method="POST" enctype="application/x-www-form-urlencoded"><input type="hidden" name="_method" value="DELETE"><input type="hidden" name="id" value=${board.uri}><button type="submit" class="close-icon">x</button> </form>
+            </div>
             <div class="content">
               <a class="author" href=${toBskyLink(handle)}>@${handle}</a>
               ${date === TODAY
-                ? `created a new board ${board.name} today`
-                : `created a new board ${board.name} on ${date}`}
-                </div>
-                <div class="delete">
-                <form action="/board" method="delete"><button type="submit">x</button></form>
-                </div>
+                ? ` created a new board ${board.name} today`
+                : ` created a new board ${board.name} on ${date}`}
             </div>
-          </div>
         `
       })}
     </div>
@@ -120,3 +120,4 @@ function ts(board: Board) {
   if (createdAt < indexedAt) return createdAt.toDateString()
   return indexedAt.toDateString()
 }
+
